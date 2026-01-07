@@ -17,7 +17,6 @@ code-overflow: scroll
 code-line-numbers: false
 code-copy: true
 cache: false
-title-slide-style: pandoc
 bibliography: references.bib
 ---
 
@@ -82,7 +81,7 @@ A road map
 
 - Reproducible & interactive reports
 
-- Bits of cool topics in data science
+- Bits of cool topics in data science & machine learning
 
 
 ## Resources
@@ -93,8 +92,6 @@ Alternatively, [posit cloud](https://posit.cloud) has a free plan
 
 **Books and tutorials**
 
--   Jared Lander's *R for everyone*
-
 -   Hadley Wickam's [R for Data Science](https://r4ds.had.co.nz). [Second edition](https://r4ds.hadley.nz)
 
 -   Paul Roback & Julie Legler's [Applied GLMs and multilevel models](https://bookdown.org/roback/bookdown-BeyondMLR)
@@ -102,6 +99,9 @@ Alternatively, [posit cloud](https://posit.cloud) has a free plan
 -   RStudio [tutorials](https://education.rstudio.com/learn)
 
 -   RStudio [books](https://www.rstudio.com/resources/books)
+
+-   Jared Lander's *R for everyone*
+
 
 ## Get RStudio started
 
@@ -124,6 +124,82 @@ Markdown/quarto combine text and R code. Compile into html/pdf/word
 -   These slides were created with quarto
 
 -   In quarto you can combine R, Python & Julia code
+
+
+## Enabling GitHub copilot
+
+Pre-requisites
+
+- Get an account at GitHub.com
+
+- Copilot access. Get a free [GitHub Student developer pack](https://education.github.com/pack)
+
+Activate copilot in RStudio
+
+1. Go to Tools -> Global Options...
+
+2. In the left menu, click "Copilot". Then "Enable GitHub Copilot"
+
+3. Click the Sign In button. Follow the steps to authenticate with GitHub. Once done, click OK to close the Global Options dialog
+
+Alternatives
+
+- Use your favorite AI (e.g. ChatGPT, Gemini, etc) on the browser
+
+- Use your favorite editor. Visual Studio Code is nice
+
+
+
+## Example
+
+Create a new R script (File -> New file -> R script)
+
+Type the following line
+
+```{r}
+# Create a scatter plot of mpg vs hp using the mtcars dataset with ggplot2 in R.
+```
+
+Place the cursor at the end of the line and wait a few seconds. Copilot should suggest the code below. Press Tab to accept it.
+
+
+:::panel-tabset 
+
+### Code
+
+```{r, eval=FALSE}
+# Load necessary library
+library(ggplot2)
+# Load the mtcars dataset
+data(mtcars)
+# Create the scatter plot
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  labs(title = "Scatter Plot of MPG vs HP",
+       x = "Horsepower (hp)",
+       y = "Miles per Gallon (mpg)") +
+  theme_minimal()
+```
+
+
+### Plot
+
+```{r, echo=FALSE}
+# Load necessary library
+library(ggplot2)
+# Load the mtcars dataset
+data(mtcars)
+# Create the scatter plot
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  labs(title = "Scatter Plot of MPG vs HP",
+       x = "Horsepower (hp)",
+       y = "Miles per Gallon (mpg)") +
+  theme_minimal()
+```
+
+:::
+
 
 # First examples
 
@@ -222,21 +298,25 @@ Basic data types: <small> `numeric`, `double`, `integer`, `logical`, `character`
 
 ```{r}
 class(z)
-is.double(z)
-is.integer(z)
+is.double(z)  #try also is.integer(z)
 as.integer(z)
 as.character(z)
 ```
 
 ```{r}
-sel= (z>5) #create a logical vector
+sel= (z > 5) #create a logical vector
 sel
+which(sel) #return indices of TRUE values
+```
+
+
+```{r}
 sel + 1  #logical vectors are internally 0/1's
 ```
 
 ```{r}
-any(z>5)
-all(z>5)
+any(z > 5)
+all(z > 5)
 ```
 
 ------------------------------------------------------------------------
