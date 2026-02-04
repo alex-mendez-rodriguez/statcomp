@@ -19,6 +19,9 @@ code-copy: true
 cache: true
 title-slide-style: pandoc
 bibliography: references.bib
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ## Reproducing these lecture notes
@@ -41,90 +44,97 @@ We also source routines.R, which has auxiliary functions
 source('../code/routines.R')
 ```
 
+## 
 
-##
+Standard theory to obtain confidence intervals / P-values relies on
+assumptions
 
-Standard theory to obtain confidence intervals / P-values relies on assumptions
+-   As $n \rightarrow \infty$ some assumptions are less relevant (e.g.
+    error normality)
 
-- As $n \rightarrow \infty$ some assumptions are less relevant (e.g. error normality)
+-   Other assumptions remain critical
 
-- Other assumptions remain critical
-
-**Example.** Let $\hat{\beta}= (X^T X)^{-1} X^T y$, where $y \in \mathbb{R}^n$, then
-$$
+**Example.** Let $\hat{\beta}= (X^T X)^{-1} X^T y$, where
+$y \in \mathbb{R}^n$, then $$
 \begin{aligned}
 &E(\hat{\beta})= (X^T X)^{-1} X^T E(y) \\
 &\mbox{Cov}(\hat{\beta})= (X^T X)^{-1} X^T \mbox{Cov}(y) X (X^T X)^{-1}
 \end{aligned}
 $$
 
-If we also assume that $y= X \beta + \epsilon$, with $\mbox{Cov}(y)= \mbox{Cov}(\epsilon)= \sigma^2 I$, then
-$$
+If we also assume that $y= X \beta + \epsilon$, with
+$\mbox{Cov}(y)= \mbox{Cov}(\epsilon)= \sigma^2 I$, then $$
 E(\hat{\beta})= (X^T X)^{-1} X^T X \beta= \beta; \mbox{Cov}(\hat{\beta})= \sigma^2 (X^T X)^{-1}
 $$
 
-We assumed **linearity** and **constant variance**. Else the result doesn't hold
+We assumed **linearity** and **constant variance**. Else the result
+doesn't hold
 
 # Bootstrap
 
 ## Reminder: sampling distribution
 
-Let $\theta$ be a parameter of interest, and $\hat{\theta}=\hat{\theta}(y)$ an estimator that depends on the observed data $y$.
-Since $y$ is random, so is $\hat{\theta}$.
+Let $\theta$ be a parameter of interest, and
+$\hat{\theta}=\hat{\theta}(y)$ an estimator that depends on the observed
+data $y$. Since $y$ is random, so is $\hat{\theta}$.
 
-**Def.** The sampling distribution of $\hat{\theta}$ is its probability distribution under repeated sampling of $y$
+**Def.** The sampling distribution of $\hat{\theta}$ is its probability
+distribution under repeated sampling of $y$
 
-
-The bootstrap (Efron, 1977) is a method to approximate the distribution of many estimators, under mild assumptions
-
+The bootstrap (Efron, 1977) is a method to approximate the distribution
+of many estimators, under mild assumptions
 
 ## Bootstrap
 
 > The sub-sample is to the sample, as the sample is to the population
 
-Let $(y,X)$ be an $n \times (p+1)$ dataset. 
-For $b=1,\ldots,B$ do
+Let $(y,X)$ be an $n \times (p+1)$ dataset. For $b=1,\ldots,B$ do
 
-1. Sample $n$ rows with replacement from $(y,X)$, store into $(\tilde{y}^{(b)},\tilde{X}^{(b)})$
+1.  Sample $n$ rows with replacement from $(y,X)$, store into
+    $(\tilde{y}^{(b)},\tilde{X}^{(b)})$
 
-2. Obtain estimator $\tilde{\theta}^{(b)}$ from $(\tilde{y}^{(b)},\tilde{X}^{(b)})$
+2.  Obtain estimator $\tilde{\theta}^{(b)}$ from
+    $(\tilde{y}^{(b)},\tilde{X}^{(b)})$
 
-For large $b$, the distribution of $\tilde{\theta}^{(b)}$ approximates that of $\hat{\theta}$
+For large $b$, the distribution of $\tilde{\theta}^{(b)}$ approximates
+that of $\hat{\theta}$
 
-Note: $n$ cannot be too small, and certain technical conditions on $\hat{\theta}$ are needed
+Note: $n$ cannot be too small, and certain technical conditions on
+$\hat{\theta}$ are needed
 
-See some [animations](https://www.stat.auckland.ac.nz/~wild/BootAnim/index.html)
+See some
+[animations](https://www.stat.auckland.ac.nz/~wild/BootAnim/index.html)
 
 ## Example. Baseball
 
-Goal: estimate batting average in major league baseball games $\geq$ 1990
+Goal: estimate batting average in major league baseball games $\geq$
+1990
 
-- ab: number of at bats
+-   ab: number of at bats
 
-- h: number of hits
+-   h: number of hits
 
 ```{r}
 baseball= baseball[baseball$year >= 1990, ]
 head(baseball)
 ```
 
----
+------------------------------------------------------------------------
 
 Batting average is $\theta= E(h) / E(\mbox{ab})$. Consider the estimator
 $$
 \hat{\theta}= \frac{\sum_{i=1}^n h_i}{\sum_{i=1}^n \mbox{ab}_i}  
 $$
 
-Central Limit Theorem: numerator and denominator in $\hat{\theta}$ approx. Normal as $n \rightarrow \infty$. But $\hat{\theta}$ may not be Normal, and anyway what is it's variance? 
-
+Central Limit Theorem: numerator and denominator in $\hat{\theta}$
+approx. Normal as $n \rightarrow \infty$. But $\hat{\theta}$ may not be
+Normal, and anyway what is it's variance?
 
 ## Example. Baseball
 
-
 Define a function to compute the batting average
 
-:::panel-tabset
-
+::: panel-tabset
 ### Base R
 
 ```{r}
@@ -134,6 +144,7 @@ bat.avg= function(data, indices=1:nrow(data)) {
 }
 bat.avg(baseball)
 ```
+
 ### Tidyverse
 
 ```{r}
@@ -144,10 +155,7 @@ bat.avg= function(data, indices=1:nrow(data)) {
 }
 bat.avg(baseball)
 ```
-
-
 :::
-
 
 For each boostrapped dataset, compute the batting average
 
@@ -161,7 +169,6 @@ for (b in 1:B) {
 }
 ```
 
-
 ## Example. Baseball
 
 ```{r}
@@ -169,8 +176,7 @@ ci= quantile(th, probs=c(.025,0.975)) #Boostrap-based 95% CI
 ci
 ```
 
-:::panel-tabset
-
+::: panel-tabset
 ### Histogram
 
 ```{r}
@@ -185,39 +191,36 @@ ggplot(th, aes(x=th)) + geom_histogram(aes(y= ..density..)) +
 ```{r}
 ggplot(th, aes(sample=th)) + geom_qq() + geom_qq_line(col='red')
 ```
-
 :::
 
 ## R functions
 
 The beauty is that the bootstrap works in more complicated settings
 
-Function `boot` (package `boot`) has a generic implementation. It requires:
+Function `boot` (package `boot`) has a generic implementation. It
+requires:
 
-- `data`: the dataset
+-   `data`: the dataset
 
-- `statistic`: function to obtain $\hat{\theta}$. Its 1st argument is the data, its 2nd argument the row indices, such as function `bat.avg` defined earlier
+-   `statistic`: function to obtain $\hat{\theta}$. Its 1st argument is
+    the data, its 2nd argument the row indices, such as function
+    `bat.avg` defined earlier
 
-- `R`: number of bootstrap samples
+-   `R`: number of bootstrap samples
 
 Further options, including parallel computing
-
-
 
 ```{r}
 avgBoot= boot(data=baseball, statistic=bat.avg, R=2000)
 boot.ci(avgBoot, conf=0.95, type="basic")
 ```
 
-
 ## Regression example
-
 
 ```{r}
 data(mtcars)
 dim(mtcars)
 ```
-
 
 ```{r}
 f= formula(mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am)
@@ -225,7 +228,8 @@ fit= lm(f, data=mtcars)
 coefSummary(fit)
 ```
 
-These intervals are valid if linear model assumptions hold (linearity, constant variance, uncorrelated errors, large $n$ / normal errors)
+These intervals are valid if linear model assumptions hold (linearity,
+constant variance, uncorrelated errors, large $n$ / normal errors)
 
 ## Check model assumptions
 
@@ -234,8 +238,7 @@ mtcars.pred= tibble(mpg=mtcars$mpg, mpg_pred= predict(fit)) |>
   mutate(res= mpg - mpg_pred)
 ```
 
-:::panel-tabset
-
+::: panel-tabset
 ### Linearity
 
 ```{r}
@@ -252,7 +255,6 @@ ggplot(mtcars.pred, aes(sample=res)) +
   geom_qq_line() +
   labs(x='Sample quantile',y='Normal quantile')
 ```
-
 :::
 
 ## Bootstrapped intervals
@@ -281,8 +283,6 @@ The estimate for the original data is in element `$t0`
 round(bhat.fit$t0, 3)
 ```
 
-
-
 ## Sampling distribution of $\hat{\theta}$
 
 Format the data into a long tibble, so we can use faceting
@@ -300,11 +300,10 @@ bhat.bootlong
 
 ## Sampling distribution of $\hat{\theta}$
 
-There are deviations from normality.
-Set `scales="free"` so that each panel uses different axis limits
+There are deviations from normality. Set `scales="free"` so that each
+panel uses different axis limits
 
-:::panel-tabset
-
+::: panel-tabset
 ### qq-plot
 
 ```{r, warning=FALSE}
@@ -322,16 +321,13 @@ ggplot(bhat.bootlong, aes(x=bootstrap_value)) +
   stat_overlay_normal_density(linetype='dashed') +
   facet_wrap(~ variable, scales="free")
 ```
-
 :::
 
 ## Bootstrap intervals
 
 Compare bootstrap intervals vs. least-squares theory
 
-
-:::panel-tabset
-
+::: panel-tabset
 ### Bootstrap
 
 ```{r}
@@ -346,10 +342,9 @@ bhat.ci
 ```{r}
 coefSummary(fit)
 ```
-
 :::
 
----
+------------------------------------------------------------------------
 
 Let's plot the intervals for easier comparison
 
@@ -366,26 +361,27 @@ ggplot(ci) +
   theme(axis.text.y=element_blank(),  axis.ticks.y=element_blank()) #remove y axis labels 
 ```
 
-# Exercise 
+# Exercise
 
----
+------------------------------------------------------------------------
 
-Data `hate_crimes`. Outcome: pre-election number of hate crimes per 100,000 population by the FBI
+Data `hate_crimes`. Outcome: pre-election number of hate crimes per
+100,000 population by the FBI
 
-- education (% adults $\geq$ 25 with high school degree)
+-   education (% adults $\geq$ 25 with high school degree)
 
-- % of people who voted Donald Trump
+-   \% of people who voted Donald Trump
 
-- Income inequality (Gini index)
+-   Income inequality (Gini index)
 
-In these data the linearity assumption is violated. 
+In these data the linearity assumption is violated.
 
 Compare the intervals reported by `lm` to those from bootstrap
 
-Turn in an html with your solution at Aula Global
-Name your file firstname_lastname.html
+Turn in an html with your solution at Aula Global Name your file
+firstname_lastname.html
 
----
+------------------------------------------------------------------------
 
 Load packages and format data.
 
@@ -407,20 +403,18 @@ The model is fit by least-squares as follows.
 fit= lm(hatecrimes_fbi ~ votes_trump + gini + hs, data=hc)
 ```
 
-
-
 # Permutation tests
 
 ## Permutation tests
 
-A strategy to test a null hypothesis without relying on parametric assumptions (normality etc.)
+A strategy to test a null hypothesis without relying on parametric
+assumptions (normality etc.)
 
 We consider two uses
 
-- Compare a mean/median/proportion across groups
+-   Compare a mean/median/proportion across groups
 
-- Assess significance of a regression coefficient
-
+-   Assess significance of a regression coefficient
 
 ## Group comparisons
 
@@ -431,34 +425,34 @@ $$H_0: \mu_1= \mu_2= \ldots = \mu_K$$
 
 General recipe to obtain a P-value
 
-1. Define a test statistic $T$ to measure evidence against $H_0$
+1.  Define a test statistic $T$ to measure evidence against $H_0$
 
-2. Compute its value in the observed data, denote by $t$
+2.  Compute its value in the observed data, denote by $t$
 
-3. Compare $t$ to the distribution of $T$ if $H_0$ were true
+3.  Compare $t$ to the distribution of $T$ if $H_0$ were true
 
 $$
 \mbox{P-value}= P(T \geq t \mid H_0)
 $$
 
-**Idea:** if $y_i$ indep. of $x_i$ (so $H_0$ true) we can permute $x_i$ without altering the distribution of $(y_i,x_i)$
+**Idea:** if $y_i$ indep. of $x_i$ (so $H_0$ true) we can permute $x_i$
+without altering the distribution of $(y_i,x_i)$
 
+------------------------------------------------------------------------
 
-----
-
-Formally, $H_0: P(y_i, x_i)= P(y_i) P(x_i)$. Define test statistic $T$ that targets our original $H_0$ (mean comparison), for example
+Formally, $H_0: P(y_i, x_i)= P(y_i) P(x_i)$. Define test statistic $T$
+that targets our original $H_0$ (mean comparison), for example
 
 $$
 T= \sum_{k=1}^K (\bar{y}_k - \bar{y})^2
 $$
 
-
-**Example.** $n=24$ mice, 12 receive a muscle relaxant and 12 placebo. We measure the time (up to 300 sec) that they run in a mill
+**Example.** $n=24$ mice, 12 receive a muscle relaxant and 12 placebo.
+We measure the time (up to 300 sec) that they run in a mill
 
 ## Mouse data
 
-:::panel-tabset
-
+::: panel-tabset
 ```{r}
 data("rotarod", package = "coin")
 ```
@@ -474,9 +468,7 @@ rotarod
 ```{r}
 ggplot(rotarod, aes(group, time)) + geom_point()
 ```
-
 :::
-
 
 ## Permutation test
 
@@ -511,7 +503,6 @@ for (b in 1:B) {
 
 ## Distribution under $H_0$
 
-
 ```{r}
 pvalue= mean(t0 >= tobs) #proportion of t0's >= tobs 
 pvalue
@@ -529,15 +520,16 @@ independence_test(time ~ group, data=rotarod, teststat="quadratic", distribution
 independence_test(time ~ group, data=rotarod, teststat="quadratic", distribution="approximate")
 ```
 
-
-
 ## Permutation tests in regression
 
-Permutation tests also apply if $x_i \in \mathbb{R}$ is a continuous covariate
+Permutation tests also apply if $x_i \in \mathbb{R}$ is a continuous
+covariate
 
 With $p>1$ covariates however, some care is needed
 
-**Example.** Does murder rate (per 100,000 population) depend on population, after accounting for literacy, income, and number of days below freezing temperature?
+**Example.** Does murder rate (per 100,000 population) depend on
+population, after accounting for literacy, income, and number of days
+below freezing temperature?
 
 ```{r}
 states= as.data.frame(state.x77) |>
@@ -548,7 +540,7 @@ fit1= lm(Murder~Population + Illiteracy+Income+Frost, data=states)
 coefSummary(fit1)
 ```
 
----
+------------------------------------------------------------------------
 
 Package `lmPerm` offers a permutation test for regression
 
@@ -559,35 +551,40 @@ summary(fit2)
 
 ## Permutations in regression
 
-To assess significance of $x_1$ in regression, it is **incorrect** to simply permute $x_1$
+To assess significance of $x_1$ in regression, it is **incorrect** to
+simply permute $x_1$
 
 If we only permute $x_1$, the null hypothesis is
 
 $$P(y | x_{1}, x_{2})= P(y \mid x_{2}) \mbox{ and }  P(x_{1}, x_{2})= P(x_{1}) P(x_{2})$$
-but we just wanted to test $P(y | x_{1}, x_{})= P(y_i \mid x_{2})$, i.e. $(x_1,x_2)$ are not independent!
+but we just wanted to test $P(y | x_{1}, x_{})= P(y_i \mid x_{2})$, i.e.
+$(x_1,x_2)$ are not independent!
 
-Residual permutation (used by `lmPerm`) is a way to address this 
-
+Residual permutation (used by `lmPerm`) is a way to address this
 
 ## Residual permutation
 
-Idea: replace $x_1$ by a permuted version $\tilde{x}_1$ that is correlated with $x_2$
+Idea: replace $x_1$ by a permuted version $\tilde{x}_1$ that is
+correlated with $x_2$
 
-1. Regress $x_1$ on $x_2$ by OLS. Let $\hat{x}_{i1}$ be the predictions, $e_i$ the residuals
+1.  Regress $x_1$ on $x_2$ by OLS. Let $\hat{x}_{i1}$ be the
+    predictions, $e_i$ the residuals
 
-2. For $b=1,\ldots,B$, do
+2.  For $b=1,\ldots,B$, do
 
-- Permute $(e_1,\ldots,e_n)$ into $(\tilde{e}_1^{(b)}, \ldots \tilde{e}_n^{(b)})$
+-   Permute $(e_1,\ldots,e_n)$ into
+    $(\tilde{e}_1^{(b)}, \ldots \tilde{e}_n^{(b)})$
 
-- Let $\tilde{x}_{i1}^{(b)}= \hat{x}_{i1} + \tilde{e}_i^{(b)}$
+-   Let $\tilde{x}_{i1}^{(b)}= \hat{x}_{i1} + \tilde{e}_i^{(b)}$
 
-- Let $\tilde{\beta}^{(b)}$ be regression estimate of $y$ on $(\tilde{x}_1,x_2)$
+-   Let $\tilde{\beta}^{(b)}$ be regression estimate of $y$ on
+    $(\tilde{x}_1,x_2)$
 
+By construction
+$\mbox{cor}(\tilde{x}_1,x_2) \approx \mbox{cor}(x_1, x_2)$. But given
+$\hat{x}_1$ (i.e. given $x_2$), $\tilde{x}_1$ is independent of $y$
 
-By construction $\mbox{cor}(\tilde{x}_1,x_2) \approx \mbox{cor}(x_1, x_2)$. But given $\hat{x}_1$ (i.e. given $x_2$), $\tilde{x}_1$ is independent of $y$
-
-
----
+------------------------------------------------------------------------
 
 Define an R function (saved in routines.R)
 
@@ -615,9 +612,9 @@ lmResPerm.onevar= function(y, x1, x2, B=5000) {
 }
 ```
 
----
+------------------------------------------------------------------------
 
-Obtain a residual permutation P-value  for Population
+Obtain a residual permutation P-value for Population
 
 ```{r}
 y= states$Murder; x1= states$Population; x2= states[,c('Illiteracy','Income','Frost')]
@@ -638,48 +635,52 @@ fit1.resperm= lmResPerm(y, x, B=5000)
 fit1.resperm$pvalue
 ```
 
-Recall the results from package `lmPerm` 
+Recall the results from package `lmPerm`
 
 ```{r}
 summary(fit2)$coef
 ```
 
-
 ## Final remarks
 
-Bootstrap is more popular than permutation: if we have CIs, we can also test the null hypothesis
+Bootstrap is more popular than permutation: if we have CIs, we can also
+test the null hypothesis
 
 Example: test $H_0: \theta=0$.
 
-- If a 95% CI for $\theta$ doesn't include 0, then P-value$\leq 0.05$ 
+-   If a 95% CI for $\theta$ doesn't include 0, then P-value$\leq 0.05$
 
-- If a 99% CI doesn't include 0, then P-value$\leq 0.01$. 
+-   If a 99% CI doesn't include 0, then P-value$\leq 0.01$.
 
-Let $(1-\alpha)$% be the largest CI that doesn't include 0. Then P-value$=\alpha$
+Let $(1-\alpha)$% be the largest CI that doesn't include 0. Then
+P-value$=\alpha$
 
+Dependent data: bootstrap needs to be adjusted (model-based bootstrap,
+block-based bootstrap...). See package `boot`
 
-Dependent data: bootstrap needs to be adjusted (model-based bootstrap, block-based bootstrap...). See package `boot`
+# Exercise
 
+------------------------------------------------------------------------
 
-# Exercise 
+Data `hate_crimes`. Outcome: pre-election number of hate crimes per
+100,000 population by the FBI
 
----
+-   education (% adults $\geq$ 25 with high school degree)
 
-Data `hate_crimes`. Outcome: pre-election number of hate crimes per 100,000 population by the FBI
+-   \% of people who voted Donald Trump
 
-- education (% adults $\geq$ 25 with high school degree)
+-   Income inequality (Gini index)
 
-- % of people who voted Donald Trump
+In these data the linearity assumption is violated.
 
-- Income inequality (Gini index)
+1.  Use bootstrap to assess whether the distribution of $\hat{\beta}$ is
+    approximately normal. For example, for each covariate $j$, obtain
+    qq-normal plots for the $B$ bootstrap estimates
+    $\hat{\beta}_j^{(1)},\ldots,\hat{\beta}_j^{(B)}$
 
-In these data the linearity assumption is violated. 
+2.  Compare the permutation test P-values to those from `lm`
 
-1. Use bootstrap to assess whether the distribution of $\hat{\beta}$ is approximately normal. For example, for each covariate $j$, obtain qq-normal plots for the $B$ bootstrap estimates $\hat{\beta}_j^{(1)},\ldots,\hat{\beta}_j^{(B)}$
-
-2. Compare the permutation test P-values to those from `lm`
-
----
+------------------------------------------------------------------------
 
 Load packages and format data.
 
@@ -700,5 +701,3 @@ The model is fit by least-squares as follows.
 ```{r}
 fit= lm(hatecrimes_fbi ~ votes_trump + gini + hs, data=hc)
 ```
-
-
