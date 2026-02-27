@@ -322,10 +322,11 @@ Define the model: 2 hidden layers with 100 units each
 ```{r}
 nunits= 100
 
-model= keras_model_sequential() |>
-  layer_dense(units= nunits, activation='relu') |>
-  layer_dense(units= nunits, activation='relu') |>
-  layer_dense(units=1, activation='sigmoid')
+model <- keras_model_sequential(layers = list(
+  layer_dense(units = nunits, activation = 'relu'),
+  layer_dense(units = nunits, activation = 'relu'),
+  layer_dense(units = 1, activation = 'sigmoid')
+))
 ```
 
 Compile the model
